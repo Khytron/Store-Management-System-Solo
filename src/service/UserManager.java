@@ -10,6 +10,7 @@ import model.Employer;
 import model.Outlet;
 import model.User;
 import model.Model;
+import model.Sales;
 import util.FilePath;
 import util.Methods;
 
@@ -22,12 +23,14 @@ public class UserManager {
     private List<Employer> employerList = new ArrayList<>();
     private List<Outlet> outletList = new ArrayList<>();
     private List<Model> modelList = new ArrayList<>();
+    private List<Sales> salesList = new ArrayList<>();
 
 
     private UserManager(){
         loadAllEmployeeData();
         loadAllOutletData();
         loadAllModelData();
+        loadAllSalesData();
     }
 
     public static UserManager getInstance() {
@@ -131,6 +134,42 @@ public class UserManager {
             modelList.add(newModel);
         }
 
+    }
+
+    private void loadAllSalesData(){
+        // Read file data from sales.csv
+        List<List<String>> salesData = Methods.readCsvFile(FilePath.salesDataPath);
+
+        // Removing the first row of salesData (column headers)
+        if (!salesData.isEmpty()){
+            salesData.remove(0);
+        }
+
+        // Clearing the sales list
+        salesList.clear();
+
+        for (List<String> sale : salesData){
+            // Getting data
+            String saleId = sale.get(0);
+            String employeeId = sale.get(1);
+            String outletCode = sale.get(2);
+            String modelName = sale.get(3);
+            String modelQuantity = sale.get(4);
+            String customerName = sale.get(5);
+            String transactionMethod = sale.get(6);
+            String totalPrice = sale.get(7);
+            String date = sale.get(8);
+            String time = sale.get(9);
+
+            // Create new Sales object and set date/time from CSV
+            Sales newSale = new Sales(saleId, employeeId, outletCode, modelName, 
+                                      modelQuantity, customerName, transactionMethod, totalPrice);
+            newSale.setDate(date);
+            newSale.setTime(time);
+
+            // Add it to the list
+            salesList.add(newSale);
+        }
     }
 
     public void setLoggedInUser(User user) {
