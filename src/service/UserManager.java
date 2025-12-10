@@ -368,15 +368,123 @@ public class UserManager {
         
     }
 
-    // Attendance Clock in
-    public void attendanceClockIn(Scanner input){
-        // System.out.println("=== Attendance Clock In ===");
-        // System.out.print("Employee ID: ");
-        // String employeeId = input.nextLine();
-        // System.out.print("Name: ");
-        // String employeeName = input.nextLine();
-        // System.out.print("Outlet: ");
-        // String Outlet = input.nextLine();
+    // Check if employee is currently clocked in
+    public boolean isEmployeeClockedIn(String employeeId) {
+        String lastStatus = getLastAttendanceStatus(employeeId);
+        return lastStatus != null && lastStatus.equals("Clocked-in");
+    }
+
+    // Get last attendance status for an employee
+    private String getLastAttendanceStatus(String employeeId) {
+        String lastStatus = null;
+        for (Attendance attendance : attendanceList) {
+            if (attendance.getEmployeeId().equalsIgnoreCase(employeeId)) {
+                lastStatus = attendance.getStatus();
+            }
+        }
+        return lastStatus;
+    }
+
+    // Get last clock-in time for calculating hours worked
+    private Attendance getLastClockIn(String employeeId) {
+        Attendance lastClockIn = null;
+        for (Attendance attendance : attendanceList) {
+            if (attendance.getEmployeeId().equalsIgnoreCase(employeeId) 
+                && attendance.getStatus().equals("Clocked-in")) {
+                lastClockIn = attendance;
+            }
+        }
+        return lastClockIn;
+    }
+
+    // Attendance Clock In
+    public void attendanceClockIn() {
+        if (loggedInUser == null) {
+            System.out.println("Error: No user logged in.");
+            return;
+        }
+
+        String employeeId = loggedInUser.getUserId();
+        String outletCode = employeeId.substring(0, 3);
+
+        // Create new attendance record
+        Attendance newAttendance = new Attendance(employeeId, outletCode, "Clocked-in");
+
+        // Write to CSV
+        try (PrintWriter writer = new PrintWriter(new FileWriter(FilePath.attendanceDataPath, true))) {
+            String[] attendanceData = {
+                newAttendance.getDate(),
+                newAttendance.getTime(),
+                newAttendance.getEmployeeId(),
+                newAttendance.getOutletCode(),
+                newAttendance.getStatus()
+            };
+            writer.println(String.join(",", attendanceData));
+
+            // Add to list
+            attendanceList.add(newAttendance);
+
+            System.out.println("\nClock In Successful!");
+            System.out.println("Date: " + newAttendance.getDate());
+            System.out.println("Time: " + newAttendance.getTime());
+        } catch (Exception e) {
+            System.err.println("Error writing to attendance file: " + e.getMessage());
+        }
+    }
+
+    // Attendance Clock Out
+    public void attendanceClockOut() {
+        if (loggedInUser == null) {
+            System.out.println("Error: No user logged in.");
+            return;
+        }
+
+        String employeeId = loggedInUser.getUserId();
+        String outletCode = employeeId.substring(0, 3);
+
+        // Get last clock-in for hours calculation
+        Attendance lastClockIn = getLastClockIn(employeeId);
+
+        // Create new attendance record
+        Attendance newAttendance = new Attendance(employeeId, outletCode, "Clocked-out");
+
+        // Write to CSV
+        try (PrintWriter writer = new PrintWriter(new FileWriter(FilePath.attendanceDataPath, true))) {
+            String[] attendanceData = {
+                newAttendance.getDate(),
+                newAttendance.getTime(),
+                newAttendance.getEmployeeId(),
+                newAttendance.getOutletCode(),
+                newAttendance.getStatus()
+            };
+            writer.println(String.join(",", attendanceData));
+
+            // Add to list
+            attendanceList.add(newAttendance);
+
+            System.out.println("\nClock Out Successful!");
+            System.out.println("Date: " + newAttendance.getDate());
+            System.out.println("Time: " + newAttendance.getTime());
+
+            // Calculate hours worked if we have a clock-in record for today
+            if (lastClockIn != null && lastClockIn.getDate().equals(newAttendance.getDate())) {
+                double hoursWorked = calculateHoursWorked(lastClockIn.getTime(), newAttendance.getTime());
+                System.out.printf("Total Hours Worked Today: %.1f Hours\n", hoursWorked);
+            }
+        } catch (Exception e) {
+            System.err.println("Error writing to attendance file: " + e.getMessage());
+        }
+    }
+
+    // Calculate hours worked between two times (HH:mm format)
+    private double calculateHoursWorked(String clockInTime, String clockOutTime) {
+        String[] inParts = clockInTime.split(":");
+        String[] outParts = clockOutTime.split(":");
+
+        int inMinutes = Integer.parseInt(inParts[0]) * 60 + Integer.parseInt(inParts[1]);
+        int outMinutes = Integer.parseInt(outParts[0]) * 60 + Integer.parseInt(outParts[1]);
+
+        return (outMinutes - inMinutes) / 60.0;
     }
 
 }

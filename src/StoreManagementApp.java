@@ -67,13 +67,29 @@ class StoreManagementApp {
             {
                 String choice = "";
                 while (true){
-                    System.out.print("\nPick One Option\n1. Logout \nYour choice: ");
+                    // Check if employee is clocked in
+                    boolean isClockedIn = userManager.isEmployeeClockedIn(loggedInUser.getUserId());
+
+                    if (isClockedIn) {
+                        System.out.print("\nPick One Option\n1. Clock Out\n2. Logout \nYour choice: ");
+                    } else {
+                        System.out.print("\nPick One Option\n1. Clock In\n2. Logout \nYour choice: ");
+                    }
+                    
                     choice = input.next();
 
                     // To fix a small error where if u do input.nextLine() it reads \n immediately
                     input.nextLine();
                 
                     if (choice.equals("1")){
+                        if (isClockedIn) {
+                            userManager.attendanceClockOut();
+                        } else {
+                            userManager.attendanceClockIn();
+                        }
+                        continue;
+                    }
+                    else if (choice.equals("2")){
                         userManager.attemptLogOut();
                         loggedInUser.logout();
                         loggedInUser = null;
