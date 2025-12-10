@@ -11,6 +11,7 @@ import model.Outlet;
 import model.User;
 import model.Model;
 import model.Sales;
+import model.Attendance;
 import util.FilePath;
 import util.Methods;
 
@@ -24,6 +25,10 @@ public class UserManager {
     private List<Outlet> outletList = new ArrayList<>();
     private List<Model> modelList = new ArrayList<>();
     private List<Sales> salesList = new ArrayList<>();
+    private List<Attendance> attendanceList = new ArrayList<>();
+
+    // Store outlet codes from model.csv header for debugging
+    private List<String> modelOutletCodes = new ArrayList<>();
 
 
     private UserManager(){
@@ -31,6 +36,7 @@ public class UserManager {
         loadAllOutletData();
         loadAllModelData();
         loadAllSalesData();
+        loadAllAttendanceData();
     }
 
     public static UserManager getInstance() {
@@ -104,9 +110,13 @@ public class UserManager {
         // Read file data from model.csv
         List<List<String>> modelData = Methods.readCsvFile(FilePath.modelDataPath);
 
-        // Removing the first row of modelData
-        if (!modelData.isEmpty()){
-            modelData.remove(0);
+        // Get header row for outlet codes
+        List<String> headers = modelData.isEmpty() ? new ArrayList<>() : modelData.remove(0);
+
+        // Store outlet codes for later use (columns 2 onwards)
+        modelOutletCodes.clear();
+        for (int i = 2; i < headers.size(); i++) {
+            modelOutletCodes.add(headers.get(i));
         }
 
         // Clearing the model list
@@ -116,24 +126,37 @@ public class UserManager {
             // Getting data
             String modelName = model.get(0);
             String modelPrice = model.get(1);
-            String modelStockC60 = model.get(0 + 2);
-            String modelStockC61 = model.get(1 + 2);
-            String modelStockC62 = model.get(2 + 2);
-            String modelStockC63 = model.get(3 + 2);
-            String modelStockC64 = model.get(4 + 2);
-            String modelStockC65 = model.get(5 + 2);
-            String modelStockC66 = model.get(6 + 2);
-            String modelStockC67 = model.get(7 + 2);
-            String modelStockC68 = model.get(8 + 2);
-            String modelStockC69 = model.get(9 + 2);
 
             // Create the new model
-            Model newModel = new Model(modelName, modelPrice, modelStockC60, modelStockC61, modelStockC62, modelStockC63, modelStockC64, modelStockC65, modelStockC66, modelStockC67, modelStockC68, modelStockC69);
+            Model newModel = new Model(modelName, modelPrice);
+
+            // Dynamically load stock for each outlet from column 2 onwards
+            for (int i = 2; i < model.size() && i < headers.size(); i++) {
+                String outletCode = headers.get(i);
+                int stock = Integer.parseInt(model.get(i));
+                newModel.setStock(outletCode, stock);
+            }
 
             // Add it to the list
             modelList.add(newModel);
         }
 
+    }
+
+    // Debug method to print all model data
+    public void printAllModelData() {
+        System.out.println("\n=== Model Data (Debug) ===");
+        System.out.println("Total models loaded: " + modelList.size());
+        System.out.println();
+
+        for (Model model : modelList) {
+            System.out.print(model.getModelName() + " | RM" + model.getModelPrice() + " | ");
+            for (String outletCode : modelOutletCodes) {
+                System.out.print(outletCode + ":" + model.getStock(outletCode) + " ");
+            }
+            System.out.println();
+        }
+        System.out.println("==========================\n");
     }
 
     private void loadAllSalesData(){
@@ -169,6 +192,36 @@ public class UserManager {
 
             // Add it to the list
             salesList.add(newSale);
+        }
+    }
+
+    private void loadAllAttendanceData(){
+        // Read file data from attendance.csv
+        List<List<String>> attendanceData = Methods.readCsvFile(FilePath.attendanceDataPath);
+
+        // Removing the first row of attendanceData (column headers)
+        if (!attendanceData.isEmpty()){
+            attendanceData.remove(0);
+        }
+
+        // Clearing the attendance list
+        attendanceList.clear();
+
+        for (List<String> attendance : attendanceData){
+            // Getting data
+            String date = attendance.get(0);
+            String time = attendance.get(1);
+            String employeeId = attendance.get(2);
+            String outletCode = attendance.get(3);
+            String status = attendance.get(4);
+
+            // Create new Attendance object and set date/time from CSV
+            Attendance newAttendance = new Attendance(employeeId, outletCode, status);
+            newAttendance.setDate(date);
+            newAttendance.setTime(time);
+
+            // Add it to the list
+            attendanceList.add(newAttendance);
         }
     }
 
