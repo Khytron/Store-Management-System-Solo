@@ -324,24 +324,26 @@ public class UserManager {
 
         System.out.print("Enter Employee Name: ");
         String employeeName = input.nextLine();
-        System.out.print("Set Password: ");
-        String employeePassword = input.next();
         System.out.print("Set Role: ");
-        String employeeRole = input.next();
+        String employeeRole = input.nextLine();
+        System.out.print("Set Password: ");
+        String employeePassword = input.nextLine();
 
         String[] newEmployeeData = {employeeId, employeeName, employeeRole, employeePassword};
+
 
         //Enter a new employee into the employee.csv file
         try(PrintWriter writer = new PrintWriter(new FileWriter(FilePath.employeeDataPath, true))){
             writer.println(String.join(",", newEmployeeData));
+            writer.flush();
             
             System.out.println("\nEmployee Successfully Registered! ");
-
-            // Reload employee data to include the new employee
-            loadAllEmployeeData();
         } catch (Exception e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
         }
+
+        // Reload employee data to include the new employee
+        loadAllEmployeeData();
     }
 
     // Check if employee ID already exists
