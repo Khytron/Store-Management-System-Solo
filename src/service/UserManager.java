@@ -7,7 +7,9 @@ import java.util.Scanner;
 
 import model.Employee;
 import model.Employer;
+import model.Outlet;
 import model.User;
+import model.Model;
 import util.FilePath;
 import util.Methods;
 
@@ -18,11 +20,14 @@ public class UserManager {
 
     private List<Employee> employeeList = new ArrayList<>();
     private List<Employer> employerList = new ArrayList<>();
-
+    private List<Outlet> outletList = new ArrayList<>();
+    private List<Model> modelList = new ArrayList<>();
 
 
     private UserManager(){
         loadAllEmployeeData();
+        loadAllOutletData();
+        loadAllModelData();
     }
 
     public static UserManager getInstance() {
@@ -51,8 +56,8 @@ public class UserManager {
             String employeeRole = employee.get(2);
             String employeePassword = employee.get(3);
 
-            // Check if its an employee or employer
-            if (Employer.employerIds.contains(employeeId)){
+            // Check if its an employee or employer based on role
+            if (Employer.isEmployerRole(employeeRole)){
                 // Its an employer
                 Employer newEmployer = new Employer(employeeId, employeeName, employeeRole, employeePassword);
                 // Add it to employer list
@@ -64,6 +69,68 @@ public class UserManager {
                 employeeList.add(newEmployee);
             }
         }
+    }
+
+    private void loadAllOutletData(){
+        // Read file data from outlet.csv
+        List<List<String>> outletData = Methods.readCsvFile(FilePath.outletDataPath);
+
+        // Removing the first row of outletData
+        if (!outletData.isEmpty()){
+            outletData.remove(0);
+        }
+
+        // Clearing the outlet list
+        outletList.clear();
+
+        for (List<String> outlet : outletData ){
+            // Getting data
+            String outletCode = outlet.get(0);
+            String outletName = outlet.get(1);
+
+            // Create the new outlet
+            Outlet newOutlet = new Outlet(outletCode, outletName);
+
+            // Add it to the list
+            outletList.add(newOutlet);
+        }
+
+    }
+
+    private void loadAllModelData(){
+        // Read file data from model.csv
+        List<List<String>> modelData = Methods.readCsvFile(FilePath.modelDataPath);
+
+        // Removing the first row of modelData
+        if (!modelData.isEmpty()){
+            modelData.remove(0);
+        }
+
+        // Clearing the model list
+        modelList.clear();
+
+        for (List<String> model : modelData ){
+            // Getting data
+            String modelName = model.get(0);
+            String modelPrice = model.get(1);
+            String modelStockC60 = model.get(0 + 2);
+            String modelStockC61 = model.get(1 + 2);
+            String modelStockC62 = model.get(2 + 2);
+            String modelStockC63 = model.get(3 + 2);
+            String modelStockC64 = model.get(4 + 2);
+            String modelStockC65 = model.get(5 + 2);
+            String modelStockC66 = model.get(6 + 2);
+            String modelStockC67 = model.get(7 + 2);
+            String modelStockC68 = model.get(8 + 2);
+            String modelStockC69 = model.get(9 + 2);
+
+            // Create the new model
+            Model newModel = new Model(modelName, modelPrice, modelStockC60, modelStockC61, modelStockC62, modelStockC63, modelStockC64, modelStockC65, modelStockC66, modelStockC67, modelStockC68, modelStockC69);
+
+            // Add it to the list
+            modelList.add(newModel);
+        }
+
     }
 
     public void setLoggedInUser(User user) {
@@ -182,6 +249,17 @@ public class UserManager {
         loggedInUser.logout();
         loggedInUser = null;
         
+    }
+
+    // Attendance Clock in
+    public void attendanceClockIn(Scanner input){
+        // System.out.println("=== Attendance Clock In ===");
+        // System.out.print("Employee ID: ");
+        // String employeeId = input.nextLine();
+        // System.out.print("Name: ");
+        // String employeeName = input.nextLine();
+        // System.out.print("Outlet: ");
+        // String Outlet = input.nextLine();
     }
 
 }

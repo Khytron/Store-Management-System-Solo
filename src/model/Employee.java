@@ -1,28 +1,23 @@
 package model;
-public class Employee {
-    // Attributes
-    private String employeeId;
-    private String employeeName;
-    private String employeeRole;
-    private String employeePassword;
+
+public class Employee extends User {
 
     public Employee(String employeeId, String employeeName, String employeeRole, String employeePassword){
-        this.employeeId = employeeId;
-        this.employeeName = employeeName;
-        this.employeeRole = employeeRole;
-        this.employeePassword = employeePassword;
+        super(employeeId, employeeName, employeeRole, employeePassword);
+        this.isEmployee = true;
     }
 
+    // Alias methods for backward compatibility
     public String getEmployeeId(){
-        return this.employeeId;
+        return this.userId;
     }
     public String getEmployeeName(){
-        return this.employeeName;
+        return this.userName;
     }
     public String getEmployeeRole(){
-        return this.employeeRole;
+        return this.userRole;
     }
     public String getEmployeePassword(){
-        return this.employeePassword;
+        return this.userPassword;
     }
 }

@@ -50,12 +50,12 @@ class StoreManagementApp {
 
                     if (choice.equals("1")){
                         userManager.registerNewEmployee(input);
-                        break;
+                        continue;
                     }
                     else if (choice.equals("2")){
                         userManager.attemptLogOut();
                         loggedInUser.logout();
-                        System.out.println("\nYou have succcessfully logged out\n");
+                        System.out.println("\nYou have successfully logged out\n");
                         loggedInUser = null;
                         break;
                     } else {
@@ -77,7 +77,7 @@ class StoreManagementApp {
                         userManager.attemptLogOut();
                         loggedInUser.logout();
                         loggedInUser = null;
-                        System.out.println("\nYou have succcessfully logged out\n");
+                        System.out.println("\nYou have successfully logged out\n");
                         
                         break;
                     }

@@ -1,39 +1,34 @@
 package model;
-import java.util.ArrayList;
+
+import java.util.Arrays;
 import java.util.List;
 
-public class Employer {
-    // Attributes
-    private String employerId;
-    private String employerName;
-    private String employerRole;
-    private String employerPassword;
-    public static List<String> employerIds = new ArrayList<>();
+public class Employer extends User {
     
-    // Lists of employer ids
-    static {
-        employerIds.add("C6001");
-        // add more here ....
-    }
+    // Roles that are considered employer roles
+    public static final List<String> EMPLOYER_ROLES = Arrays.asList("Manager", "Owner", "Employer");
 
     public Employer(String employerId, String employerName, String employerRole, String employerPassword){
-        this.employerId = employerId;
-        this.employerName = employerName;
-        this.employerRole = employerRole;
-        this.employerPassword = employerPassword;
-
+        super(employerId, employerName, employerRole, employerPassword);
+        this.isEmployer = true;
     }
 
-      public String getEmployerId(){
-        return this.employerId;
+    // Check if a role is an employer role
+    public static boolean isEmployerRole(String role) {
+        return EMPLOYER_ROLES.stream().anyMatch(r -> r.equalsIgnoreCase(role));
+    }
+
+    // Alias methods for backward compatibility
+    public String getEmployerId(){
+        return this.userId;
     }
     public String getEmployerName(){
-        return this.employerName;
+        return this.userName;
     }
     public String getEmployerRole(){
-        return this.employerRole;
+        return this.userRole;
     }
     public String getEmployerPassword(){
-        return this.employerPassword;
+        return this.userPassword;
     }
 }

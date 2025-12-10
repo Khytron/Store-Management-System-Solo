@@ -1,15 +1,14 @@
 package model;
 
 public class User {
-    //Attributes
-    private String userId;
-    private String userName;
-    private String userRole;
-    private String userPassword;
+    // Attributes
+    protected String userId;
+    protected String userName;
+    protected String userRole;
+    protected String userPassword;
     public boolean isEmployee = false;
     public boolean isEmployer = false;
     public boolean isLogged = false;
-    
 
     public User(String userId, String userName, String userRole, String userPassword){
         this.userId = userId;
@@ -22,7 +21,7 @@ public class User {
         if (!this.isLogged && this.userId != null) { 
             this.isLogged = true; 
             // Check if its an employee or employer
-            if (this.userRole.equalsIgnoreCase("Employer") || this.userRole.equalsIgnoreCase("Manager")) {
+            if (this.userRole.equalsIgnoreCase("Employer") || this.userRole.equalsIgnoreCase("Manager") || this.userRole.equalsIgnoreCase("Owner")) {
                 this.isEmployer = true;
             } else {
                 this.isEmployee = true;
