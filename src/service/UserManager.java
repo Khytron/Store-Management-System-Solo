@@ -221,10 +221,17 @@ public class UserManager {
 
     public void registerNewEmployee(Scanner input){
         System.out.println("=== Register New Employee ===");
+        System.out.print("Enter Employee ID: ");
+        String employeeId = input.nextLine();
+
+        // Check for duplicate employee ID
+        if (isEmployeeIdExists(employeeId)) {
+            System.out.println("\nRegistration Failed: Employee ID '" + employeeId + "' already exists!");
+            return;
+        }
+
         System.out.print("Enter Employee Name: ");
         String employeeName = input.nextLine();
-        System.out.print("Enter Employee ID: ");
-        String employeeId = input.next();
         System.out.print("Set Password: ");
         String employeePassword = input.next();
         System.out.print("Set Role: ");
@@ -237,9 +244,27 @@ public class UserManager {
             writer.println(String.join(",", newEmployeeData));
             
             System.out.println("\nEmployee Successfully Registered! ");
+
+            // Reload employee data to include the new employee
+            loadAllEmployeeData();
         } catch (Exception e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
         }
+    }
+
+    // Check if employee ID already exists
+    private boolean isEmployeeIdExists(String employeeId) {
+        for (Employee emp : employeeList) {
+            if (emp.getEmployeeId().equalsIgnoreCase(employeeId)) {
+                return true;
+            }
+        }
+        for (Employer emp : employerList) {
+            if (emp.getEmployerId().equalsIgnoreCase(employeeId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void attemptLogOut(){
